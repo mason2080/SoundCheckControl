@@ -5,10 +5,6 @@ VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C Sharp Example", "C Sharp Example.csproj", "{01959E19-ECBB-42F5-8C2B-64A93931AED5}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AudioTestSystem", "..\AudioTestSystem\AudioTestSystem.vdproj", "{3C1745DD-448C-498E-B2C9-FC525EEF458E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Driver.Port.SerialPort", "..\Driver.Port.SerialPort\Driver.Port.SerialPort.csproj", "{0FFBB8FC-2892-4F0C-A7F8-D5952787CD86}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,20 +21,6 @@ Global
 		{01959E19-ECBB-42F5-8C2B-64A93931AED5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{01959E19-ECBB-42F5-8C2B-64A93931AED5}.Release|x86.ActiveCfg = Release|x86
 		{01959E19-ECBB-42F5-8C2B-64A93931AED5}.Release|x86.Build.0 = Release|x86
-		{3C1745DD-448C-498E-B2C9-FC525EEF458E}.Debug|Any CPU.ActiveCfg = Debug
-		{3C1745DD-448C-498E-B2C9-FC525EEF458E}.Debug|x86.ActiveCfg = Debug
-		{3C1745DD-448C-498E-B2C9-FC525EEF458E}.Debug|x86.Build.0 = Debug
-		{3C1745DD-448C-498E-B2C9-FC525EEF458E}.Release|Any CPU.ActiveCfg = Release
-		{3C1745DD-448C-498E-B2C9-FC525EEF458E}.Release|x86.ActiveCfg = Release
-		{3C1745DD-448C-498E-B2C9-FC525EEF458E}.Release|x86.Build.0 = Release
-		{0FFBB8FC-2892-4F0C-A7F8-D5952787CD86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0FFBB8FC-2892-4F0C-A7F8-D5952787CD86}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0FFBB8FC-2892-4F0C-A7F8-D5952787CD86}.Debug|x86.ActiveCfg = Debug|x86
-		{0FFBB8FC-2892-4F0C-A7F8-D5952787CD86}.Debug|x86.Build.0 = Debug|x86
-		{0FFBB8FC-2892-4F0C-A7F8-D5952787CD86}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0FFBB8FC-2892-4F0C-A7F8-D5952787CD86}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0FFBB8FC-2892-4F0C-A7F8-D5952787CD86}.Release|x86.ActiveCfg = Release|x86
-		{0FFBB8FC-2892-4F0C-A7F8-D5952787CD86}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

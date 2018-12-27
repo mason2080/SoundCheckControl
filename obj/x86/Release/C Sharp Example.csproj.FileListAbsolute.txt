@@ -15,3 +15,18 @@ C:\Users\Administrator\Desktop\LabVIEW2014\C Sharp\C Sharp_SCAudioTest\Source\ob
 C:\Users\Administrator\Desktop\LabVIEW2014\C Sharp\C Sharp_SCAudioTest\Source\obj\x86\Release\C Sharp Example.exe
 C:\Users\Administrator\Desktop\LabVIEW2014\C Sharp\C Sharp_SCAudioTest\Source\obj\x86\Release\C Sharp Example.pdb
 C:\Users\Administrator\Desktop\LabVIEW2014\C Sharp\C Sharp_SCAudioTest\Source\obj\x86\Release\C Sharp Example.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\SoundCheckControl\bin\x86\Release\C Sharp Example.exe.config
+C:\Users\Administrator\Desktop\SoundCheckControl\bin\x86\Release\C Sharp Example.exe
+C:\Users\Administrator\Desktop\SoundCheckControl\bin\x86\Release\C Sharp Example.pdb
+C:\Users\Administrator\Desktop\SoundCheckControl\bin\x86\Release\Newtonsoft.Json.dll
+C:\Users\Administrator\Desktop\SoundCheckControl\bin\x86\Release\Newtonsoft.Json.xml
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\SoundCheckTCPClient.Form1.resources
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\SoundCheckTCPClient.Login.resources
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\SoundCheckTCPClient.Project.resources
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\SoundCheckTCPClient.Properties.Resources.resources
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example.csproj.GenerateResource.cache
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example.csproj.CopyComplete
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example.exe
+C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example.pdb
