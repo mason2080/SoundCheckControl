@@ -1,0 +1,22 @@
+∆Ù”√,≤Ω÷Ë√˚≥∆,≤Œ ˝,∑µªÿ÷µ,≥¨ ±ms, ß∞‹∫Û∂Ø◊˜,÷ÿ≤‚¥Œ ˝,÷ÿ≤‚ ß∞‹¥¶¿Ì
+"False","ShowDialog","ø™ º≤‚ ‘","","",,"","Õ£÷π"
+"True","SWITCH/COM3_SEND","ALL_OFF","","","ºÃ–¯","","Õ£÷π"
+"True","SWITCH/COM3_SEND","ALL1_OFF","","","ºÃ–¯","","Õ£÷π"
+"True","BOX1/COM1_GET","READY","","-1","ºÃ–¯","3","Õ£÷π"
+"True","SWITCH/COM3_SEND","chA1_s1_ON","","",,"","Õ£÷π"
+"True","SWITCH/COM3_SEND","chB1_s1_ON","","",,"","Õ£÷π"
+"True","SWITCH/COM3_SEND","chA_s1_ON","","",,"","Õ£÷π"
+"True","SWITCH/COM3_SEND","chB_s1_ON","","",,"","Õ£÷π"
+"True","BT1/COM4_SEND_GET","AutoConnect","CONNECTED","10000","÷ÿ≤‚","3","Õ£÷π"
+"True","RunSeq","C:\SoundCheck 15.0-x86\Sequences\Loudspeakers\Complete test.sqc","","",,"","Õ£÷π"
+"True","VP/COM7_GET",">OPEN HFP_!","","-1",,"","Õ£÷π"
+"True","BT1/COM4_SEND_GET",">OPEN HFP_!","HFP","10000",,"3","Õ£÷π"
+"True","SWITCH/COM3_SEND","ALL_OFF","","",,"","Õ£÷π"
+"True","SWITCH/COM3_SEND","ALL1_OFF","","",,"","Õ£÷π"
+"True","SWITCH/COM3_SEND","chA_s2_ON","","",,"","Õ£÷π"
+"True","SWITCH/COM3_SEND","chA1_s2_ON","","",,"","Õ£÷π"
+"True","VP/COM7_SEND","HFP","","",,"","Õ£÷π"
+"False","VP/COM7_GET","FINISHED","","-1",,"",""
+"False","BT1/COM4_SEND_GET","DISCONNECT","OK","10000","÷ÿ≤‚","3",""
+,"Wait",,,,,,
+,,,,,,,
