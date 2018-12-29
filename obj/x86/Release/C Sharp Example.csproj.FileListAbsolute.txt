@@ -30,3 +30,19 @@ C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example
 C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example.csproj.CopyComplete
 C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example.exe
 C:\Users\Administrator\Desktop\SoundCheckControl\obj\x86\Release\C Sharp Example.pdb
+E:\GitHub\SoundCheckControl\bin\x86\Release\C Sharp Example.exe.config
+E:\GitHub\SoundCheckControl\bin\x86\Release\C Sharp Example.exe
+E:\GitHub\SoundCheckControl\bin\x86\Release\C Sharp Example.pdb
+E:\GitHub\SoundCheckControl\bin\x86\Release\Newtonsoft.Json.dll
+E:\GitHub\SoundCheckControl\bin\x86\Release\Newtonsoft.Json.xml
+E:\GitHub\SoundCheckControl\obj\x86\Release\SoundCheckTCPClient.CurveRange.resources
+E:\GitHub\SoundCheckControl\obj\x86\Release\SoundCheckTCPClient.Form1.resources
+E:\GitHub\SoundCheckControl\obj\x86\Release\SoundCheckTCPClient.Login.resources
+E:\GitHub\SoundCheckControl\obj\x86\Release\SoundCheckTCPClient.Project.resources
+E:\GitHub\SoundCheckControl\obj\x86\Release\SoundCheckTCPClient.Properties.Resources.resources
+E:\GitHub\SoundCheckControl\obj\x86\Release\C Sharp Example.csproj.GenerateResource.cache
+E:\GitHub\SoundCheckControl\obj\x86\Release\C Sharp Example.csproj.CoreCompileInputs.cache
+E:\GitHub\SoundCheckControl\obj\x86\Release\C Sharp Example.csproj.CopyComplete
+E:\GitHub\SoundCheckControl\obj\x86\Release\C Sharp Example.exe
+E:\GitHub\SoundCheckControl\obj\x86\Release\C Sharp Example.pdb
+E:\GitHub\SoundCheckControl\obj\x86\Release\C Sharp Example.csprojAssemblyReference.cache

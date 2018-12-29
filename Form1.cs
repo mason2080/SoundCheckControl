@@ -14,6 +14,7 @@ using System.Threading;
 using System.Drawing;
 using System.Data.OleDb;
 using ThreadState = System.Threading.ThreadState;
+using System.Runtime.InteropServices;
 
 namespace SoundCheckTCPClient
 {
@@ -25,8 +26,15 @@ namespace SoundCheckTCPClient
         OPEN
     }
 
+
+
     public partial class Form1 : Form
     {
+        [DllImport("SetRange.dll", EntryPoint = "SetRange")]
+        static extern void SetRange(double index, double[] ValueX, double[] ValueY, Int32 LenX, Int32 LenY);
+
+        private static System.Diagnostics.Process p;
+
         private TcpClient client;
         public StreamReader STR;
         public StreamWriter STW;
@@ -67,6 +75,7 @@ namespace SoundCheckTCPClient
         string stepPathLeft = "";
         string stepPathRight = "";
         string rangePath = "";
+        string curvePath = "";
 
         public delegate void CrossDelegateShowCurve();
 
@@ -78,6 +87,105 @@ namespace SoundCheckTCPClient
         bool testings = false;
 
         int[] curveIndex = new int[6];
+        int[] curveJudgeType = new int[12];
+        double[] curveLowLimit = new double[6];
+        double[] curveHighLimit = new double[6];
+
+        int failCntLeft = 0;
+        int passCntLeft = 0;
+
+        int failCntRight = 0;
+        int passCntRight = 0;
+        string whichcontrol_name = "";
+        int curveRightClickIndex = 0;
+
+        double[] XData;
+        double[] YData;
+        double[] XData_Min;
+        double[] YData_Min;
+        double[] XData_Max;
+        double[] YData_Max;
+
+
+        double[] XData1;
+        double[] YData1;
+        double[] XData1_Min;
+        double[] YData1_Min;
+        double[] XData1_Max;
+        double[] YData1_Max;
+
+        double[] XData2;
+        double[] YData2;
+        double[] XData2_Min;
+        double[] YData2_Min;
+        double[] XData2_Max;
+        double[] YData2_Max;
+
+        double[] XData3;
+        double[] YData3;
+        double[] XData3_Min;
+        double[] YData3_Min;
+        double[] XData3_Max;
+        double[] YData3_Max;
+
+        double[] XData4;
+        double[] YData4;
+        double[] XData4_Min;
+        double[] YData4_Min;
+        double[] XData4_Max;
+        double[] YData4_Max;
+
+        double[] XData5;
+        double[] YData5;
+        double[] XData5_Min;
+        double[] YData5_Min;
+        double[] XData5_Max;
+        double[] YData5_Max;
+        //
+
+        double[] RXData;
+        double[] RYData;
+        double[] RXData_Min;
+        double[] RYData_Min;
+        double[] RXData_Max;
+        double[] RYData_Max;
+
+
+        double[] RXData1;
+        double[] RYData1;
+        double[] RXData1_Min;
+        double[] RYData1_Min;
+        double[] RXData1_Max;
+        double[] RYData1_Max;
+
+        double[] RXData2;
+        double[] RYData2;
+        double[] RXData2_Min;
+        double[] RYData2_Min;
+        double[] RXData2_Max;
+        double[] RYData2_Max;
+
+        double[] RXData3;
+        double[] RYData3;
+        double[] RXData3_Min;
+        double[] RYData3_Min;
+        double[] RXData3_Max;
+        double[] RYData3_Max;
+
+        double[] RXData4;
+        double[] RYData4;
+        double[] RXData4_Min;
+        double[] RYData4_Min;
+        double[] RXData4_Max;
+        double[] RYData4_Max;
+
+        double[] RXData5;
+        double[] RYData5;
+        double[] RXData5_Min;
+        double[] RYData5_Min;
+        double[] RXData5_Max;
+        double[] RYData5_Max;
+
 
         string[] stepNames ={"Wait",
                              "RunSeq",
@@ -137,16 +245,13 @@ namespace SoundCheckTCPClient
             flagCom4OK_HFP = false;
             flag_TOHFP = false;
             string fName = Directory.GetCurrentDirectory().ToString() + "\\Ref.ini";
+
             FileStream fs = new FileStream(fName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             fs.Close();
 
             buttonStart.Enabled = false;
             btnStop.Enabled = false;
-
-
-
             timeCount1 = 0;
-
             textBoxSeqFilePath.Text = sqcpath;
             try
             {
@@ -156,13 +261,8 @@ namespace SoundCheckTCPClient
                 comboBox3.SelectedIndex = int.Parse(iniFile.IniReadValue(fName, "基准", "SerialPort3"));
                 comboBox4.SelectedIndex = int.Parse(iniFile.IniReadValue(fName, "基准", "SerialPort4"));
                 comboBox5.SelectedIndex = int.Parse(iniFile.IniReadValue(fName, "基准", "SerialPort5"));
-
-
-
                 comboBoxVirtual.SelectedIndex = int.Parse(iniFile.IniReadValue(fName, "基准", "VirtualPort"));
-
                 comboBoxWindowState.SelectedIndex = int.Parse(iniFile.IniReadValue(fName, "基准", "SouncCheckStatus"));
-
                 textBoxExePath.Text= iniFile.IniReadValue(fName, "基准", "SouncCheckPath");
                 //textBoxSeqFilePath.Text = iniFile.IniReadValue(fName, "基准", "SeqPath");
                 ConnectToIPAddress.Text = iniFile.IniReadValue(fName, "基准", "IP");
@@ -177,19 +277,33 @@ namespace SoundCheckTCPClient
                 curveIndex[4] = int.Parse(iniFile.IniReadValue(fName, "基准", "comboCurve5"));
                 curveIndex[5] = int.Parse(iniFile.IniReadValue(fName, "基准", "comboCurve6"));
 
+                //curveJudgeType[0] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge1"));
+                //curveJudgeType[1] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge2"));
+                //curveJudgeType[2] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge3"));
+                //curveJudgeType[3] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge4"));
+                //curveJudgeType[4] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge5"));
+                //curveJudgeType[5] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge6"));
+
+                //curveLowLimit[0] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveLowLimit1"));
+                //curveLowLimit[1] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveLowLimit2"));
+                //curveLowLimit[2] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveLowLimit3"));
+                //curveLowLimit[3] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveLowLimit4"));
+                //curveLowLimit[4] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveLowLimit5"));
+                //curveLowLimit[5] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveLowLimit6"));
+
+                //curveHighLimit[0] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveHighLimit1"));
+                //curveHighLimit[1] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveHighLimit2"));
+                //curveHighLimit[2] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveHighLimit3"));
+                //curveHighLimit[3] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveHighLimit4"));
+                //curveHighLimit[4] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveHighLimit5"));
+                //curveHighLimit[5] = double.Parse(iniFile.IniReadValue(fName, "基准", "CurveHighLimit6"));
             }
             catch
             { }
 
             RunSoundCheck();
-
             timerConnectSC.Enabled = true;
-
             //InitMenu();
-
-
-
-           
         }
 
         ////Add Procuct To Menu
@@ -271,25 +385,6 @@ namespace SoundCheckTCPClient
                     return;
                 }
 
-
-                //if (File.Exists(rangePath))
-                //{
-                //  //  ReadCsvToDataGrid(fName, 1, dataGridView2);
-
-                //    AppendLogMessage("Load Range:" + rangePath);
-                //}
-                //else
-                //{
-                //   // MessageBox.Show("文件不存在");
-                //    textTestResult.Text = "加载失败";
-                //    textTestResult.BackColor = Color.Red;
-                //    return;
-                //}
-
-
-
-
-
                 DirectoryInfo folder = new DirectoryInfo(fPath);
                 foreach (FileInfo file in folder.GetFiles("*.sqc"))
                 {
@@ -347,7 +442,7 @@ namespace SoundCheckTCPClient
                 stepPathRight = Directory.GetCurrentDirectory().ToString() + "\\测试产品\\" + projectName + "\\StepRight.csv";
 
                 rangePath = Directory.GetCurrentDirectory().ToString() + "\\测试产品\\" + projectName + "\\Range.csv";
-
+                curvePath = Directory.GetCurrentDirectory().ToString() + "\\测试产品\\" + projectName + "\\curve.ini";
                 if (File.Exists(stepPathLeft))
                 {
                     ReadCsvToDataGrid(stepPathLeft, 1, dataGridViewLeft);
@@ -375,65 +470,10 @@ namespace SoundCheckTCPClient
                     textTestResultL.BackColor = Color.Red;
                     return;
                 }
-
-                if (File.Exists(rangePath))
-                {
-                    ReadCsvToValueTable(rangePath, 1, dataGridView);
-
-                    AppendLogMessage("Load Range:" + rangePath);
-                }
-                else
-                {
-                    MessageBox.Show("判断标准文件不存在");
-                    textTestResultL.Text = "加载失败";
-                    textTestResultL.BackColor = Color.Red;
-                    return;
-                }
-
-
-                //if (File.Exists(rangePath))
-                //{
-                //  //  ReadCsvToDataGrid(fName, 1, dataGridView2);
-
-                //    AppendLogMessage("Load Range:" + rangePath);
-                //}
-                //else
-                //{
-                //   // MessageBox.Show("文件不存在");
-                //    textTestResult.Text = "加载失败";
-                //    textTestResult.BackColor = Color.Red;
-                //    return;
-                //}
-
-
-
-
-
-                //DirectoryInfo folder = new DirectoryInfo(fPath);
-                //foreach (FileInfo file in folder.GetFiles("*.sqc"))
-                //{
-                //    if (file.FullName.IndexOf("(Main).sqc") >= 0)
-                //    {
-                //        seqPathMainTest = file.FullName;
-                //        AppendLogMessage("Load Main sqc:" + file.FullName);
-                //    }
-
-                //    //if (file.FullName.IndexOf("(Null).sqc") >= 0)
-                //    //{
-                //    //    seqPathNullTest = file.FullName;
-                //    //    AppendLogMessage("Load Null sqc:" + file.FullName);
-                //    //}
-                //}
-
-
                     buttonStart.Visible = true;
                     btnStop.Visible = true;
                     tabControl2.Enabled = true;
                     tabControl2.SelectedIndex = 0;
-
-                   // textTestResult.Text = "加载成功";
-
-
             }
             catch
             {
@@ -733,33 +773,6 @@ namespace SoundCheckTCPClient
                     {
                         btnSeqRun.Enabled = true;
                         AppendLogMessage("Sequence Opened. Ready to run!");
-
-                        //if (SendCommandAndGetResponse("Sequence.GetStepsList")) // Send Sequence.GetStepsList command and wait for result.
-                        //{
-                        //    // Command completed successfully
-
-                        //    //Column Headers
-                        //    string[] colHeaders = new string[] { "Step Name", "Step Type", "Input Channel", "Output Channel" };
-
-                        //    DataTable dataTable = InitializeDataTable(colHeaders.Length);
-
-                        //    // Populate Data Table
-                        //    stepsList = json.Value<JArray>("returnData"); // Convert return data to dynamic objects array
-
-                        //    foreach (JObject row in stepsList.Children<JObject>())
-                        //    {
-                        //        DataRow dataRow = dataTable.NewRow();
-                        //        dataRow[0] = row.Value<string>("Name");
-                        //        dataRow[1] = row.Value<string>("Type");
-                        //        dataRow[2] = FormatChannelNames(row.Value<JArray>("InputChannelNames"));
-                        //        dataRow[3] = FormatChannelNames(row.Value<JArray>("OutputChannelNames"));
-                        //        dataTable.Rows.Add(dataRow);
-                        //    }
-
-                        //    // Update DataGridView
-                        //    dataGridView.DataSource = dataTable;
-                        //    UpdateHeaders(colHeaders);
-                        //}
                     }
                     else
                     {
@@ -808,13 +821,6 @@ namespace SoundCheckTCPClient
                             int i = 0;
                             foreach (JObject row in stepsList.Children<JObject>())
                             {
-                                //DataRow dataRow = dataTable.NewRow();
-                                //dataRow[0] = row.Value<string>("Name");
-                                //dataRow[1] = row.Value<string>("Type");
-                                //dataRow[2] = FormatChannelNames(row.Value<JArray>("InputChannelNames"));
-                                //dataRow[3] = FormatChannelNames(row.Value<JArray>("OutputChannelNames"));
-                                //dataTable.Rows.Add(dataRow);
-
                                 dataGridView.Rows.Add();
 
                                 dataGridView.Rows[i].Cells[0].Value = false;
@@ -825,21 +831,6 @@ namespace SoundCheckTCPClient
                                 i++;
 
                             }
-
-
-                            //foreach (JObject row in stepsList.Children<JObject>())
-                            //{
-                            //    DataRow dataRow = dataTable.NewRow();
-                            //    dataRow[0] = row.Value<string>("Name");
-                            //    dataRow[1] = row.Value<string>("Type");
-                            //    dataRow[2] = FormatChannelNames(row.Value<JArray>("InputChannelNames"));
-                            //    dataRow[3] = FormatChannelNames(row.Value<JArray>("OutputChannelNames"));
-                            //    dataTable.Rows.Add(dataRow);
-                            //}
-
-                            //// Update DataGridView
-                            //dataGridView.DataSource = dataTable;
-                            //UpdateHeaders(colHeaders);
                         }
                     }
                     else
@@ -932,32 +923,7 @@ namespace SoundCheckTCPClient
                         dataGridViewRange.Rows[i].Cells[1].Value = "";
                         dataGridViewRange.Rows[i].Cells[1].Value = "";
                         dataGridViewRange.Rows[i].Cells[1].Value = "";
-
-                        //dataRow[0] = stepsList[i].Value<string>("Name");
-                        //dataRow[1] = stepsList[i].Value<string>("Type");
-                        //dataRow[2] = FormatChannelNames(stepsList[i].Value<JArray>("InputChannelNames"));
-                        //dataRow[3] = FormatChannelNames(stepsList[i].Value<JArray>("OutputChannelNames"));
-
-
-                        //if (stepResults[i].Value<Boolean>("Evaluated"))
-                        //{
-                        //    //if (stepResults[i].Value<Boolean>("Verdict"))
-                        //    //{ dataRow[4] = "Pass"; }
-                        //    //else
-                        //    //{ dataRow[4] = "Fail"; }
-
-                        //    dataRow[2] = stepResults[i].Value<Double>("Margin").ToString();
-                        //    dataRow[3] = stepResults[i].Value<string>("Limit");
-                        //    dataRow[4] = stepResults[i].Value<string>("Max/Min");
-                        //    //dataRow[6] = stepResults[i].Value<string>("Limit");
-                        //    // dataRow[7] = stepResults[i].Value<string>("Max/Min");
-                        //}
-
-                        //dataTable.Rows.Add(dataRow);
                     }
-
-                    //dataGridView.DataSource = dataTable;
-                    //UpdateHeaders(colHeaders);
                 }
                 catch
                 {
@@ -975,13 +941,13 @@ namespace SoundCheckTCPClient
 
                 // Command completed successfully
                 AppendLogMessage("Sequence ran to completion.");
-
+                passCntLeft = 0;
+                failCntLeft = 0;
                 try
                 {
                     // Populate Data Table
                     JArray stepResults = json.returnData.Value<JArray>("StepResults"); // Convert return data to dynamic objects array
-                    int failCnt = 0;
-                    int passCnt = 0;
+
                     for (int i = 0; i < stepResults.Count; i++)
                     // JObject row in stepResults.Children<JObject>()
                     {
@@ -998,12 +964,12 @@ namespace SoundCheckTCPClient
                                     if ((double.Parse((string)(dataGridView.Rows[j].Cells[4].Value)) >= double.Parse((string)(dataGridView.Rows[j].Cells[2].Value))) && (double.Parse((string)(dataGridView.Rows[j].Cells[4].Value)) <= double.Parse((string)(dataGridView.Rows[j].Cells[3].Value))))
                                     {
                                         dataGridView.Rows[j].Cells[4].Style.BackColor = Color.Green;
-                                         passCnt++;
+                                         passCntLeft++;
                                     }
                                     else
                                     {
                                         dataGridView.Rows[j].Cells[4].Style.BackColor = Color.Red;
-                                        failCnt++;
+                                        failCntLeft++;
                                     }
                                 }
                                 catch
@@ -1011,20 +977,7 @@ namespace SoundCheckTCPClient
 
                                 }
                             }
-                           // break;
                         }
-                    }
-
-
-                    if (failCnt > 0)
-                    {
-                        textTestResultL.BackColor = Color.Red;
-                        textTestResultL.Text = "失败";
-                    }
-                    else
-                    {
-                        textTestResultL.BackColor = Color.Green;
-                        textTestResultL.Text = "成功";
                     }
                 }
                 catch
@@ -1072,9 +1025,8 @@ namespace SoundCheckTCPClient
                             
                         }
                     }
-                    CrossDelegateShowCurve dl = new CrossDelegateShowCurve(showCurve);
+                    CrossDelegateShowCurve dl = new CrossDelegateShowCurve(showCurveLeft);
                     this.BeginInvoke(dl);
-                   // showCurve();
                     comboCurveNames.Enabled = true; // Enable the combobox
                 }
                 catch
@@ -1096,8 +1048,8 @@ namespace SoundCheckTCPClient
                 try
                 {
                     JArray stepResults = json.returnData.Value<JArray>("StepResults"); // Convert return data to dynamic objects array
-                    int failCnt = 0;
-                    int passCnt = 0;
+                    failCntRight = 0;
+                    passCntRight = 0;
 
                     for (int i = 0; i < stepResults.Count; i++)
                     // JObject row in stepResults.Children<JObject>()
@@ -1115,12 +1067,12 @@ namespace SoundCheckTCPClient
                                     if ((double.Parse((string)(dataGridView.Rows[j].Cells[5].Value)) >= double.Parse((string)(dataGridView.Rows[j].Cells[2].Value))) && (double.Parse((string)(dataGridView.Rows[j].Cells[5].Value)) <= double.Parse((string)(dataGridView.Rows[j].Cells[3].Value))))
                                     {
                                         dataGridView.Rows[j].Cells[5].Style.BackColor = Color.Green;
-                                        passCnt++;
+                                        passCntRight++;
                                     }
                                     else
                                     {
                                         dataGridView.Rows[j].Cells[5].Style.BackColor = Color.Red;
-                                        failCnt++;
+                                        failCntRight++;
                                     }
                                 }
                                 catch
@@ -1131,27 +1083,6 @@ namespace SoundCheckTCPClient
                         }
 
                     }
-
-                    if (failCnt > 0)
-                    {
-                        textTestResultR.BackColor = Color.Red;
-                    }
-                    else
-                    {
-                        textTestResultR.BackColor = Color.Green;
-                    }
-
-                    if (failCnt > 0)
-                    {
-                        textTestResultR.BackColor = Color.Red;
-                        textTestResultR.Text = "失败";
-                    }
-                    else
-                    {
-                        textTestResultR.BackColor = Color.Green;
-                        textTestResultR.Text = "成功";
-                    }
-
                 }
                 catch
                 {
@@ -1200,7 +1131,7 @@ namespace SoundCheckTCPClient
 
                         }
                     }
-                    CrossDelegateShowCurve dl = new CrossDelegateShowCurve(showCurve);
+                    CrossDelegateShowCurve dl = new CrossDelegateShowCurve(showCurveRight);
                     this.BeginInvoke(dl);
 
                    // showCurve();
@@ -1226,31 +1157,12 @@ namespace SoundCheckTCPClient
                     // Command completed successfully
                     AppendLogMessage("Sequence ran to completion.");
 
-                    //if (GetReturnDataBoolean("Pass?"))
-                    //{ labelVerdict.Text = "Pass"; }
-                    //else
-                    //{ labelVerdict.Text = "Fail"; }
-
-                    //labelMargin.Text = GetReturnDataDouble("Margin").ToString();
-
-                    // Update Data Table
-                    // Column Headers
-                    //string[] colHeaders = new string[] { "Step Name", "Step Type", "Input Channel", "Output Channel", "Verdict", "Margin", "Limit", "Max/Min" };
-                    //string[] colHeaders = new string[] { "Step Name", "Step Type", "Margin", "Limit", "Max/Min" };
-
-                    //DataTable dataTable = InitializeDataTable(colHeaders.Length);
-
                     // Populate Data Table
                     JArray stepResults = json.returnData.Value<JArray>("StepResults"); // Convert return data to dynamic objects array
 
                     for (int i = 0; i < stepResults.Count; i++)
                     // JObject row in stepResults.Children<JObject>()
                     {
-                        //DataRow dataRow = dataTable.NewRow();
-                        //dataRow[0] = stepsList[i].Value<string>("Name");
-                        //dataRow[1] = stepsList[i].Value<string>("Type");
-                        //dataRow[2] = FormatChannelNames(stepsList[i].Value<JArray>("InputChannelNames"));
-                        //dataRow[3] = FormatChannelNames(stepsList[i].Value<JArray>("OutputChannelNames"));
                         for (int j = 0; j < dataGridView.RowCount; j++)
                         {
                             if ((string)(dataGridView.Rows[j].Cells[1].Value) == stepsList[i].Value<string>("Name"))
@@ -1277,27 +1189,7 @@ namespace SoundCheckTCPClient
                             }
                             break;
                         }
-
-                        //if (stepResults[i].Value<Boolean>("Evaluated"))
-                        //{
-                        //    //if (stepResults[i].Value<Boolean>("Verdict"))
-                        //    //{ dataRow[4] = "Pass"; }
-                        //    //else
-                        //    //{ dataRow[4] = "Fail"; }
-
-                        //    dataRow[2] = stepResults[i].Value<Double>("Margin").ToString();
-                        //    dataRow[3] = stepResults[i].Value<string>("Limit");
-                        //    dataRow[4] = stepResults[i].Value<string>("Max/Min");
-                        //    //dataRow[6] = stepResults[i].Value<string>("Limit");
-                        //    // dataRow[7] = stepResults[i].Value<string>("Max/Min");
-                        //}
-
-                        //dataTable.Rows.Add(dataRow);
                     }
-
-                    // Update DataGridView
-                    //dataGridView.DataSource = dataTable;
-                    //UpdateHeaders(colHeaders);
 
                     if (SendCommandAndGetResponse("MemoryList.GetAllNames")) // Send MemoryList.GetAllNames command and wait for result.
                     {
@@ -1314,7 +1206,451 @@ namespace SoundCheckTCPClient
             { }
         }
 
-        private void showCurve()
+        private void judgeCurveFuncLeft(byte index)
+        {
+            int tempFailCnt = 0;
+
+            double[] value_x;
+            double[] value_y;
+            double[] min_x;
+            double[] min_y;
+            double[] max_x;
+            double[] max_y;
+
+            if (index == 0)
+            {
+                value_x = XData;
+                value_y = YData;
+                min_x = XData_Min;
+                min_y = YData_Min;
+                max_x = XData_Max;
+                max_y = YData_Max;
+            }
+            else if (index == 1)
+            {
+                value_x = XData1;
+                value_y = YData1;
+                min_x = XData1_Min;
+                min_y = YData1_Min;
+                max_x = XData1_Max;
+                max_y = YData1_Max;
+            }
+            else if (index == 2)
+            {
+                value_x = XData2;
+                value_y = YData2;
+                min_x = XData2_Min;
+                min_y = YData2_Min;
+                max_x = XData2_Max;
+                max_y = YData2_Max;
+            }
+            else if (index == 3)
+            {
+                value_x = XData3;
+                value_y = YData3;
+                min_x = XData3_Min;
+                min_y = YData3_Min;
+                max_x = XData3_Max;
+                max_y = YData3_Max;
+            }
+            else if (index == 4)
+            {
+                value_x = XData4;
+                value_y = YData4;
+                min_x = XData4_Min;
+                min_y = YData4_Min;
+                max_x = XData4_Max;
+                max_y = YData4_Max;
+            }
+            else if (index == 5)
+            {
+                value_x = XData5;
+                value_y = YData5;
+                min_x = XData5_Min;
+                min_y = YData5_Min;
+                max_x = XData5_Max;
+                max_y = YData5_Max;
+            }
+            else
+            {
+                value_x = XData;
+                value_y = YData;
+                min_x = XData_Min;
+                min_y = YData_Min;
+                max_x = XData_Max;
+                max_y = YData_Max;
+            }
+
+
+            if (curveJudgeType[index] > 0)
+            {
+                if (curveJudgeType[index] == 1)
+                {
+                    for (int j = 0; j < dataGridView.RowCount; j++) //find CurveData Index
+                    {
+                        if ((string)(dataGridView.Rows[j].Cells[1].Value) =="WaveForm"+index.ToString())
+                        {
+                            //dataGridView.Rows[j].Cells[4].Value = YData.Min().ToString() + "," + YData.Max().ToString();
+
+                            for (int k = 0; k < min_x.Length; k++)
+                            {
+                                for (int kk = 0; kk < value_x.Length; kk++)
+                                {
+                                    if (min_x[k] == value_x[kk])//逐点比较下限范围值每个点
+                                    {
+                                        if (value_y[kk] >= min_y[k])
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            tempFailCnt++;
+                                            failCntLeft++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            for (int k = 0; k < max_x.Length; k++)
+                            {
+                                for (int kk = 0; kk < value_x.Length; kk++)
+                                {
+                                    if (max_x[k] == value_x[kk])//逐点比较上限限范围值每个点
+                                    {
+                                        if (value_y[kk] < max_y[k])
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            tempFailCnt++;
+                                            failCntLeft++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            ////////////////
+                            if (tempFailCnt == 0)
+                            {
+                                dataGridView.Rows[j].Cells[4].Style.BackColor = Color.Green;
+                            }
+                            else
+                            {
+                                dataGridView.Rows[j].Cells[4].Style.BackColor = Color.Red;
+                            }
+
+                        }
+
+                    }
+                }
+                else if (curveJudgeType[index] == 2)
+                {
+                    for (int j = 0; j < dataGridView.RowCount; j++) //find CurveData Index
+                    {
+                        if ((string)(dataGridView.Rows[j].Cells[1].Value) == "WaveForm" + index.ToString())
+                        {
+                          //  dataGridView.Rows[j].Cells[4].Value = YData.Min().ToString() + "," + YData.Max().ToString();
+
+                            for (int k = 0; k < max_x.Length; k++)
+                            {
+                                for (int kk = 0; kk < value_x.Length; kk++)
+                                {
+                                    if (max_x[k] == value_x[kk])//逐点比较上限限范围值每个点
+                                    {
+                                        if (value_y[kk] < max_y[k])
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            tempFailCnt++;
+                                            failCntLeft++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            ////////////////
+                            if (tempFailCnt == 0)
+                            {
+                                dataGridView.Rows[j].Cells[4].Style.BackColor = Color.Green;
+                            }
+                            else
+                            {
+                                dataGridView.Rows[j].Cells[4].Style.BackColor = Color.Red;
+                            }
+
+                        }
+
+                    }
+                }
+                else if (curveJudgeType[index] == 3)
+                {
+                    for (int j = 0; j < dataGridView.RowCount; j++) //find CurveData Index
+                    {
+                        if ((string)(dataGridView.Rows[j].Cells[1].Value) == "WaveForm" + index.ToString())
+                        {
+                            //dataGridView.Rows[j].Cells[4].Value = YData.Min().ToString() + "," + YData.Max().ToString();
+
+                            for (int k = 0; k < min_x.Length; k++)
+                            {
+                                for (int kk = 0; kk < XData.Length; kk++)
+                                {
+                                    if (min_x[k] == value_x[kk])//逐点比较下限范围值每个点
+                                    {
+                                        if (value_y[kk] >= min_y[k])
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            tempFailCnt++;
+                                            failCntLeft++;
+                                        }
+                                    }
+                                }
+                            }
+                            ////////////////
+                            if (tempFailCnt == 0)
+                            {
+                                dataGridView.Rows[j].Cells[4].Style.BackColor = Color.Green;
+                            }
+                            else
+                            {
+                                dataGridView.Rows[j].Cells[4].Style.BackColor = Color.Red;
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+        private void judgeCurveFuncRight(byte index)
+        {
+            int tempFailCnt = 0;
+
+            double[] value_x;
+            double[] value_y;
+            double[] min_x;
+            double[] min_y;
+            double[] max_x;
+            double[] max_y;
+
+            if (index == 6)
+            {
+                value_x = RXData;
+                value_y = RYData;
+                min_x = RXData_Min;
+                min_y = RYData_Min;
+                max_x = RXData_Max;
+                max_y = RYData_Max;
+            }
+            else if (index == 7)
+            {
+                value_x = RXData1;
+                value_y = RYData1;
+                min_x = RXData1_Min;
+                min_y = RYData1_Min;
+                max_x = RXData1_Max;
+                max_y = RYData1_Max;
+            }
+            else if (index == 8)
+            {
+                value_x = RXData2;
+                value_y = RYData2;
+                min_x = RXData2_Min;
+                min_y = RYData2_Min;
+                max_x = RXData2_Max;
+                max_y = RYData2_Max;
+            }
+            else if (index == 9)
+            {
+                value_x = RXData3;
+                value_y = RYData3;
+                min_x = RXData3_Min;
+                min_y = RYData3_Min;
+                max_x = RXData3_Max;
+                max_y = RYData3_Max;
+            }
+            else if (index == 10)
+            {
+                value_x = RXData4;
+                value_y = RYData4;
+                min_x = RXData4_Min;
+                min_y = RYData4_Min;
+                max_x = RXData4_Max;
+                max_y = RYData4_Max;
+            }
+            else if (index == 11)
+            {
+                value_x = RXData5;
+                value_y = RYData5;
+                min_x = RXData5_Min;
+                min_y = RYData5_Min;
+                max_x = RXData5_Max;
+                max_y = RYData5_Max;
+            }
+            else
+            {
+                value_x = RXData;
+                value_y = RYData;
+                min_x = RXData_Min;
+                min_y = RYData_Min;
+                max_x = RXData_Max;
+                max_y = RYData_Max;
+            }
+
+
+            if (curveJudgeType[index] > 0)
+            {
+                if (curveJudgeType[index] == 1)
+                {
+
+                    for (int j = 0; j < dataGridView.RowCount; j++) //find CurveData Index
+                    {
+                        if ((string)(dataGridView.Rows[j].Cells[1].Value) == "WaveForm" + (index-5).ToString())
+                        {
+                           // dataGridView.Rows[j].Cells[5].Value = value_y.Min().ToString() + "," + value_y.Max().ToString();
+
+                            for (int k = 0; k < min_x.Length; k++)
+                            {
+                                for (int kk = 0; kk < value_x.Length; kk++)
+                                {
+                                    if (min_x[k] == value_x[kk])//逐点比较下限范围值每个点
+                                    {
+                                        if (value_y[kk] >= min_y[k])
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            tempFailCnt++;
+                                            failCntRight++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            for (int k = 0; k < max_x.Length; k++)
+                            {
+                                for (int kk = 0; kk < value_x.Length; kk++)
+                                {
+                                    if (max_x[k] == value_x[kk])//逐点比较上限限范围值每个点
+                                    {
+                                        if (value_y[kk] < max_y[k])
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            tempFailCnt++;
+                                            failCntRight++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            ////////////////
+                            if (tempFailCnt == 0)
+                            {
+                                dataGridView.Rows[j].Cells[5].Style.BackColor = Color.Green;
+                            }
+                            else
+                            {
+                                dataGridView.Rows[j].Cells[5].Style.BackColor = Color.Red;
+                            }
+
+                        }
+
+                    }
+                }
+                else if (curveJudgeType[index] == 2)
+                {
+                    for (int j = 0; j < dataGridView.RowCount; j++) //find CurveData Index
+                    {
+                        if ((string)(dataGridView.Rows[j].Cells[1].Value) == "WaveForm" + (index - 5).ToString())
+                        {
+                          //  dataGridView.Rows[j].Cells[5].Value = value_y.Max().ToString();
+
+                            for (int k = 0; k < max_x.Length; k++)
+                            {
+                                for (int kk = 0; kk < value_x.Length; kk++)
+                                {
+                                    if (max_x[k] == value_x[kk])//逐点比较上限限范围值每个点
+                                    {
+                                        if (value_y[kk] < max_y[k])
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            tempFailCnt++;
+                                            failCntRight++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            ////////////////
+                            if (tempFailCnt == 0)
+                            {
+                                dataGridView.Rows[j].Cells[5].Style.BackColor = Color.Green;
+                            }
+                            else
+                            {
+                                dataGridView.Rows[j].Cells[5].Style.BackColor = Color.Red;
+                            }
+
+                        }
+
+                    }
+                }
+                else if (curveJudgeType[index] == 3)
+                {
+                    for (int j = 0; j < dataGridView.RowCount; j++) //find CurveData Index
+                    {
+                        if ((string)(dataGridView.Rows[j].Cells[1].Value) == "WaveForm" + (index - 5).ToString())
+                        {
+                           // dataGridView.Rows[j].Cells[5].Value = value_y.Min().ToString() + "," + value_y.Max().ToString();
+
+                            for (int k = 0; k < min_x.Length; k++)
+                            {
+                                for (int kk = 0; kk < value_x.Length; kk++)
+                                {
+                                    if (min_x[k] == value_x[kk])//逐点比较下限范围值每个点
+                                    {
+                                        if (value_y[kk] >= min_y[k])
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            tempFailCnt++;
+                                            failCntRight++;
+                                        }
+                                    }
+                                }
+                            }
+                            ////////////////
+                            if (tempFailCnt == 0)
+                            {
+                                dataGridView.Rows[j].Cells[5].Style.BackColor = Color.Green;
+                            }
+                            else
+                            {
+                                dataGridView.Rows[j].Cells[5].Style.BackColor = Color.Red;
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+        private void showCurveLeft()
         {
             int pointNumbers=0;
             if (comboCurveNames.SelectedIndex > -1 && comboCurveNames.SelectedIndex < comboCurveNames.Items.Count) // Make sure selection is valid
@@ -1330,44 +1666,39 @@ namespace SoundCheckTCPClient
                         try
                         {
                             // Get X and Y data and plot them on the chart
-                            double[] XData = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
-                            double[] YData = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+                             XData = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                             YData = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
 
-                            //if ((XData.Length > 0)&&(XData.Length==YData.Length))
-                            //{
-                            //    chartCurve.Series["Series1"].Points.Clear(); // Clear chart
-                            //}
-                            //else
-                            //{
-                            //    return;
-                            //}
-
-
-                         //   chartCurve.ChartAreas[0].AxisX.Minimum = XData.Min();
-                         //   chartCurve.ChartAreas[0].AxisX.Maximum = XData.Max();
 
                             chartCurve.Series["Series1"].Points.DataBindXY(XData, YData);
+                            if (curveJudgeType[0] > 0)
+                            {
+                                chartCurve.Series[1].Points.DataBindXY(XData_Min, YData_Min);
+                                chartCurve.Series[2].Points.DataBindXY(XData_Max, YData_Max);
+                            }
 
-                            //for (int i = 0; i < XData.Length; i++)
-                            //{
-                            //    chartCurve.Series["Series1"].Points.AddXY(XData[i], YData[i]);
-                            //}
-
-
-                            // chartCurve.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
-
+                            judgeCurveFuncLeft(0);
 
                             chartCurve.ChartAreas[0].AxisX.Minimum = XData.Min();
                             chartCurve.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
 
+                            chartCurve.ChartAreas[1].AxisX.Minimum = XData.Min();
+                            chartCurve.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+
+                            chartCurve.ChartAreas[2].AxisX.Minimum = XData.Min();
+                            chartCurve.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
 
                             if (XData.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
                             {
                                 chartCurve.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chartCurve.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chartCurve.ChartAreas[2].AxisX.IsLogarithmic = true;
                             }
                             else
                             {
                                 chartCurve.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chartCurve.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chartCurve.ChartAreas[2].AxisX.IsLogarithmic = true;
                             }
                         }
                         catch (Exception)
@@ -1402,8 +1733,8 @@ namespace SoundCheckTCPClient
                         try
                         {
                             // Get X and Y data and plot them on the chart
-                            double[] XData = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
-                            double[] YData = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+                             XData1 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                             YData1 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
 
                             //if ((XData.Length > 0) && (XData.Length == YData.Length))
                             //{
@@ -1413,31 +1744,36 @@ namespace SoundCheckTCPClient
                             //{
                             //    return;
                             //}
-
-                            
-                            // chart1.ChartAreas[0].AxisX.Maximum = XData.Max();
-
-                            chart1.Series["Series1"].Points.DataBindXY(XData, YData);
-                            //  chart1.ChartAreas[0].AxisX.Minimum = XData.Min();
-                            //for (int i = 0; i < XData.Length; i++)
-                            //{
-                            //    chart1.Series["Series1"].Points.AddXY(XData[i], YData[i]);
-                            //}
+                            judgeCurveFuncLeft(1);
 
 
-                            //  chart1.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+                            chart1.Series["Series1"].Points.DataBindXY(XData1, YData1);
+                            if (curveJudgeType[1] > 0)
+                            {
+                                chart1.Series[1].Points.DataBindXY(XData1_Min, YData1_Min);
+                                chart1.Series[2].Points.DataBindXY(XData1_Max, YData1_Max);
+                            }
 
-
-                            chart1.ChartAreas[0].AxisX.Minimum = XData.Min();
+                            chart1.ChartAreas[0].AxisX.Minimum = XData1.Min();
                             chart1.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
 
-                            if (XData.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            chart1.ChartAreas[1].AxisX.Minimum = XData1.Min();
+                            chart1.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+
+                            chart1.ChartAreas[2].AxisX.Minimum = XData1.Min();
+                            chart1.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
+
+                            if (XData1.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
                             {
                                 chart1.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart1.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart1.ChartAreas[2].AxisX.IsLogarithmic = true;
                             }
                             else
                             {
                                 chart1.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart1.ChartAreas[1].AxisX.IsLogarithmic = false;
+                                chart1.ChartAreas[2].AxisX.IsLogarithmic = false;
                             }
                         }
                         catch (Exception)
@@ -1473,40 +1809,39 @@ namespace SoundCheckTCPClient
                         {
 
                             // Get X and Y data and plot them on the chart
-                            double[] XData = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
-                            double[] YData = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+                             XData2 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                             YData2 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
 
-                            //if ((XData.Length > 0) && (XData.Length == YData.Length))
-                            //{
-                            //    chart2.Series["Series1"].Points.Clear(); // Clear chart
-                            //}
-                            //else
-                            //{
-                            //    return;
-                            //}
+                            judgeCurveFuncLeft(2);
 
-                            
                             // chart2.ChartAreas[0].AxisX.Maximum = XData.Max();
 
 
-                            chart2.Series["Series1"].Points.DataBindXY(XData, YData);
-                            chart2.ChartAreas[0].AxisX.Minimum = XData.Min();
-                            //for (int i = 0; i < XData.Length; i++)
-                            //{
-                            //    chart2.Series["Series1"].Points.AddXY(XData[i], YData[i]);
-                            //}
+                            chart2.Series["Series1"].Points.DataBindXY(XData2, YData2);
+                            if (curveJudgeType[2] > 0)
+                            {
+                                chart2.Series[1].Points.DataBindXY(XData2_Min, YData2_Min);
+                                chart2.Series[2].Points.DataBindXY(XData2_Max, YData2_Max);
+                            }
 
+                            chart2.ChartAreas[0].AxisX.Minimum = XData2.Min();
+                            chart2.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+                            chart2.ChartAreas[1].AxisX.Minimum = XData2.Min();
+                            chart2.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+                            chart2.ChartAreas[2].AxisX.Minimum = XData2.Min();
+                            chart2.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
 
-                              chart2.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
-
-
-                            if (XData.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            if (XData2.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
                             {
                                 chart2.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart2.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart2.ChartAreas[2].AxisX.IsLogarithmic = true;
                             }
                             else
                             {
                                 chart2.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart2.ChartAreas[1].AxisX.IsLogarithmic = false;
+                                chart2.ChartAreas[2].AxisX.IsLogarithmic = false;
                             }
                         }
                         catch (Exception)
@@ -1541,40 +1876,36 @@ namespace SoundCheckTCPClient
                         try
                         {
                             // Get X and Y data and plot them on the chart
-                            double[] XData = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
-                            double[] YData = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+                            XData3 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                            YData3 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
 
-                            //if ((XData.Length > 0) && (XData.Length == YData.Length))
-                            //{
-                            //    chart3.Series["Series1"].Points.Clear(); // Clear chart
-                            //}
-                            //else
-                            //{
-                            //    return;
-                            //}
+                            judgeCurveFuncLeft(3);
 
-                           
-                            // chart3.ChartAreas[0].AxisX.Maximum = XData.Max();
+                            chart3.Series["Series1"].Points.DataBindXY(XData3, YData3);
+                            if (curveJudgeType[3] > 0)
+                            {
+                                chart3.Series[1].Points.DataBindXY(XData3_Min, YData3_Min);
+                                chart3.Series[2].Points.DataBindXY(XData3_Max, YData3_Max);
+                            }
 
-
-                            chart3.Series["Series1"].Points.DataBindXY(XData, YData);
-                            chart3.ChartAreas[0].AxisX.Minimum = XData.Min();
-                            //for (int i = 0; i < XData.Length; i++)
-                            //{
-                            //    chart3.Series["Series1"].Points.AddXY(XData[i], YData[i]);
-                            //}
-
-
+                            chart3.ChartAreas[0].AxisX.Minimum = XData3.Min();
                             chart3.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+                            chart3.ChartAreas[1].AxisX.Minimum = XData3.Min();
+                            chart3.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+                            chart3.ChartAreas[2].AxisX.Minimum = XData3.Min();
+                            chart3.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
 
-
-                            if (XData.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            if (XData3.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
                             {
                                 chart3.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart3.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart3.ChartAreas[2].AxisX.IsLogarithmic = true;
                             }
                             else
                             {
                                 chart3.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart3.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart3.ChartAreas[2].AxisX.IsLogarithmic = true;
                             }
                         }
                         catch (Exception)
@@ -1608,39 +1939,39 @@ namespace SoundCheckTCPClient
                         try
                         {
                             // Get X and Y data and plot them on the chart
-                            double[] XData = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
-                            double[] YData = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+                            XData4 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                            YData4 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
 
-                            //if ((XData.Length > 0) && (XData.Length == YData.Length))
-                            //{
-                            //    chart4.Series["Series1"].Points.Clear(); // Clear chart
-                            //}
-                            //else
-                            //{
-                            //    return;
-                            //}
-
-                       
-                            //chart4.ChartAreas[0].AxisX.Maximum = XData.Max();
-
-                            chart4.Series["Series1"].Points.DataBindXY(XData, YData);
-                            chart4.ChartAreas[0].AxisX.Minimum = XData.Min();
-                            //for (int i = 0; i < XData.Length; i++)
-                            //{
-                            //    chart4.Series["Series1"].Points.AddXY(XData[i], YData[i]);
-                            //}
+                            judgeCurveFuncLeft(4);
 
 
-                             chart4.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+                            chart4.Series["Series1"].Points.DataBindXY(XData4, YData4);
+                            if (curveJudgeType[4] > 0)
+                            {
+                                chart4.Series[1].Points.DataBindXY(XData4_Min, YData4_Min);
+                                chart4.Series[2].Points.DataBindXY(XData4_Max, YData4_Max);
+                            }
 
+                            chart4.ChartAreas[0].AxisX.Minimum = XData4.Min();
+                            chart4.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
 
-                            if (XData.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            chart4.ChartAreas[1].AxisX.Minimum = XData4.Min();
+                            chart4.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+
+                            chart4.ChartAreas[2].AxisX.Minimum = XData4.Min();
+                            chart4.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
+
+                            if (XData4.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
                             {
                                 chart4.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart4.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart4.ChartAreas[2].AxisX.IsLogarithmic = true;
                             }
                             else
                             {
                                 chart4.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart4.ChartAreas[1].AxisX.IsLogarithmic = false;
+                                chart4.ChartAreas[2].AxisX.IsLogarithmic = false;
                             }
                         }
                         catch (Exception)
@@ -1674,40 +2005,37 @@ namespace SoundCheckTCPClient
                         try
                         {
                             // Get X and Y data and plot them on the chart
-                            double[] XData = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
-                            double[] YData = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+                            XData5 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                            YData5 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
 
-                            //if ((XData.Length > 0) && (XData.Length == YData.Length))
-                            //{
-                            //    chart5.Series["Series1"].Points.Clear(); // Clear chart
-                            //}
-                            //else
-                            //{
-                            //    return;
-                            //}
+                            judgeCurveFuncLeft(5);
 
-                           
-                            //    chart5.ChartAreas[0].AxisX.Maximum = XData.Max();
+                            chart5.Series["Series1"].Points.DataBindXY(XData5, YData5);
 
-                            chart5.Series["Series1"].Points.DataBindXY(XData, YData);
-                            chart5.ChartAreas[0].AxisX.Minimum = XData.Min();
+                            if (curveJudgeType[5] > 0)
+                            {
+                                chart5.Series[1].Points.DataBindXY(XData5_Min, YData5_Min);
+                                chart5.Series[2].Points.DataBindXY(XData5_Max, YData5_Max);
+                            }
 
-                            //for (int i = 0; i < XData.Length; i++)
-                            //{
-                            //    chart5.Series["Series1"].Points.AddXY(XData[i], YData[i]);
-                            //}
+                            chart5.ChartAreas[0].AxisX.Minimum = XData5.Min();
+                            chart5.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+                            chart5.ChartAreas[1].AxisX.Minimum = XData5.Min();
+                            chart5.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+                            chart5.ChartAreas[2].AxisX.Minimum = XData5.Min();
+                            chart5.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
 
-
-                             chart5.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
-
-
-                            if (XData.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            if (XData5.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
                             {
                                 chart5.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart5.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart5.ChartAreas[2].AxisX.IsLogarithmic = true;
                             }
                             else
                             {
                                 chart5.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart5.ChartAreas[1].AxisX.IsLogarithmic = false;
+                                chart5.ChartAreas[2].AxisX.IsLogarithmic = false;
                             }
                         }
                         catch (Exception)
@@ -1727,8 +2055,438 @@ namespace SoundCheckTCPClient
 
                 }
             }
+
+            if (failCntLeft > 0)
+            {
+                textTestResultL.BackColor = Color.Red;
+                textTestResultL.Text = "失败";
+            }
+            else
+            {
+                textTestResultL.BackColor = Color.Green;
+                textTestResultL.Text = "成功";
+            }
         }
 
+
+        private void showCurveRight()
+        {
+            int pointNumbers = 0;
+            if (comboCurveNames.SelectedIndex > -1 && comboCurveNames.SelectedIndex < comboCurveNames.Items.Count) // Make sure selection is valid
+            {
+                if (SendCommandAndGetResponse("MemoryList.Get('Curve','" + (string)comboCurveNames.SelectedItem + "')")) // Send MemoryList.Get('Curve','<curve name> command and wait for response
+                {                                                                         //(string)comboCurveNames.SelectedText
+                    // Command completed successfully
+                    if (json.returnData.Value<Boolean>("Found"))
+                    {
+                        //chartCurve.Series["Series1"].Points.Clear(); // Clear chart
+                        // chartCurve.Titles["Curve"].Text = (string)comboCurveNames.SelectedItem; // Set chart title
+
+                        try
+                        {
+                            // Get X and Y data and plot them on the chart
+                            RXData = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                            RYData = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+
+
+                            chartCurve.Series["Series1"].Points.DataBindXY(RXData, RYData);
+
+                            if (curveJudgeType[6] > 0)
+                            {
+                                chartCurve.Series[1].Points.DataBindXY(RXData_Min, RYData_Min);
+                                chartCurve.Series[2].Points.DataBindXY(RXData_Max, RYData_Max);
+                            }
+
+                            judgeCurveFuncLeft(6);
+
+                            chartCurve.ChartAreas[0].AxisX.Minimum = RXData.Min();
+                            chartCurve.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+
+                            chartCurve.ChartAreas[1].AxisX.Minimum = RXData.Min();
+                            chartCurve.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+
+                            chartCurve.ChartAreas[2].AxisX.Minimum = RXData.Min();
+                            chartCurve.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
+
+                            if (RXData.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            {
+                                chartCurve.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chartCurve.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chartCurve.ChartAreas[2].AxisX.IsLogarithmic = true;
+                            }
+                            else
+                            {
+                                chartCurve.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chartCurve.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chartCurve.ChartAreas[2].AxisX.IsLogarithmic = true;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    else
+                    {
+                        // textBoxCurveInfo.Text = "Curve data not found!";
+                        //chartCurve.ChartAreas[0].AxisX.IsLogarithmic = false;
+                        //foreach (var series in chartCurve.Series)
+                        //{
+                        //    series.Points.Clear();
+                        //}
+                        //chartCurve.Titles["Curve"].Text = "";
+                    }
+
+                }
+            }
+
+            Thread.Sleep(200);
+            if (comboBox6.SelectedIndex > -1 && comboBox6.SelectedIndex < comboBox6.Items.Count) // Make sure selection is valid
+            {
+                if (SendCommandAndGetResponse("MemoryList.Get('Curve','" + (string)comboBox6.SelectedItem + "')")) // Send MemoryList.Get('Curve','<curve name> command and wait for response
+                {
+                    // Command completed successfully
+                    if (json.returnData.Value<Boolean>("Found"))
+                    {
+
+                        //chart1.Titles["Curve"].Text = (string)comboBox6.SelectedItem; // Set chart title
+
+                        try
+                        {
+                            // Get X and Y data and plot them on the chart
+                            RXData1 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                            RYData1 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+
+                            //if ((XData.Length > 0) && (XData.Length == YData.Length))
+                            //{
+                            //    chart1.Series["Series1"].Points.Clear(); // Clear chart
+                            //}
+                            //else
+                            //{
+                            //    return;
+                            //}
+                            judgeCurveFuncLeft(7);
+
+
+                            chart1.Series["Series1"].Points.DataBindXY(RXData1, RYData1);
+                            if (curveJudgeType[7] > 0)
+                            {
+                                chart1.Series[1].Points.DataBindXY(RXData1_Min, RYData1_Min);
+                                chart1.Series[2].Points.DataBindXY(RXData1_Max, RYData1_Max);
+                            }
+
+                            chart1.ChartAreas[0].AxisX.Minimum = RXData1.Min();
+                            chart1.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+
+                            chart1.ChartAreas[1].AxisX.Minimum = RXData1.Min();
+                            chart1.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+
+                            chart1.ChartAreas[2].AxisX.Minimum = RXData1.Min();
+                            chart1.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
+
+                            if (RXData1.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            {
+                                chart1.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart1.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart1.ChartAreas[2].AxisX.IsLogarithmic = true;
+                            }
+                            else
+                            {
+                                chart1.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart1.ChartAreas[1].AxisX.IsLogarithmic = false;
+                                chart1.ChartAreas[2].AxisX.IsLogarithmic = false;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    else
+                    {
+                        //// textBoxCurveInfo.Text = "Curve data not found!";
+                        //chart1.ChartAreas[0].AxisX.IsLogarithmic = false;
+                        //foreach (var series in chart1.Series)
+                        //{
+                        //    series.Points.Clear();
+                        //}
+                        //chart1.Titles["Curve"].Text = "";
+                    }
+
+                }
+            }
+
+            Thread.Sleep(100);
+            if (comboBox7.SelectedIndex > -1 && comboBox7.SelectedIndex < comboBox7.Items.Count) // Make sure selection is valid
+            {
+                if (SendCommandAndGetResponse("MemoryList.Get('Curve','" + (string)comboBox7.SelectedItem + "')")) // Send MemoryList.Get('Curve','<curve name> command and wait for response
+                {
+                    // Command completed successfully
+                    if (json.returnData.Value<Boolean>("Found"))
+                    {
+                        //chart2.Series["Series1"].Points.Clear(); // Clear chart
+                        // chart2.Titles["Curve"].Text = (string)comboBox7.SelectedItem; // Set chart title
+
+                        try
+                        {
+
+                            // Get X and Y data and plot them on the chart
+                            RXData2 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                            RYData2 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+
+                            judgeCurveFuncLeft(8);
+
+                            // chart2.ChartAreas[0].AxisX.Maximum = XData.Max();
+
+
+                            chart2.Series["Series1"].Points.DataBindXY(RXData2, RYData2);
+                            if (curveJudgeType[8] > 0)
+                            {
+                                chart2.Series[1].Points.DataBindXY(RXData2_Min, RYData2_Min);
+                                chart2.Series[2].Points.DataBindXY(RXData2_Max, RYData2_Max);
+                            }
+
+                            chart2.ChartAreas[0].AxisX.Minimum = RXData2.Min();
+                            chart2.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+                            chart2.ChartAreas[1].AxisX.Minimum = RXData2.Min();
+                            chart2.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+                            chart2.ChartAreas[2].AxisX.Minimum = RXData2.Min();
+                            chart2.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
+
+                            if (RXData2.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            {
+                                chart2.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart2.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart2.ChartAreas[2].AxisX.IsLogarithmic = true;
+                            }
+                            else
+                            {
+                                chart2.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart2.ChartAreas[1].AxisX.IsLogarithmic = false;
+                                chart2.ChartAreas[2].AxisX.IsLogarithmic = false;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    else
+                    {
+                        //// textBoxCurveInfo.Text = "Curve data not found!";
+                        //chart2.ChartAreas[0].AxisX.IsLogarithmic = false;
+                        //foreach (var series in chart2.Series)
+                        //{
+                        //    series.Points.Clear();
+                        //}
+                        //chart2.Titles["Curve"].Text = "";
+                    }
+
+                }
+            }
+            Thread.Sleep(200);
+
+            if (comboBox8.SelectedIndex > -1 && comboBox8.SelectedIndex < comboBox8.Items.Count) // Make sure selection is valid
+            {
+                if (SendCommandAndGetResponse("MemoryList.Get('Curve','" + (string)comboBox8.SelectedItem + "')")) // Send MemoryList.Get('Curve','<curve name> command and wait for response
+                {
+                    // Command completed successfully
+                    if (json.returnData.Value<Boolean>("Found"))
+                    {
+                        //chart3.Series["Series1"].Points.Clear(); // Clear chart
+                        //  chart3.Titles["Curve"].Text = (string)comboBox8.SelectedItem; // Set chart title
+
+                        try
+                        {
+                            // Get X and Y data and plot them on the chart
+                            RXData3 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                            RYData3 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+
+                            judgeCurveFuncLeft(9);
+
+                            chart3.Series["Series1"].Points.DataBindXY(RXData3, RYData3);
+                            if (curveJudgeType[9] > 0)
+                            {
+                                chart3.Series[1].Points.DataBindXY(RXData3_Min, RYData3_Min);
+                                chart3.Series[2].Points.DataBindXY(RXData3_Max, RYData3_Max);
+                            }
+
+                            chart3.ChartAreas[0].AxisX.Minimum = RXData3.Min();
+                            chart3.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+                            chart3.ChartAreas[1].AxisX.Minimum = RXData3.Min();
+                            chart3.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+                            chart3.ChartAreas[2].AxisX.Minimum = RXData3.Min();
+                            chart3.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
+
+                            if (RXData3.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            {
+                                chart3.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart3.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart3.ChartAreas[2].AxisX.IsLogarithmic = true;
+                            }
+                            else
+                            {
+                                chart3.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart3.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart3.ChartAreas[2].AxisX.IsLogarithmic = true;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    else
+                    {
+                        //// textBoxCurveInfo.Text = "Curve data not found!";
+                        //chart3.ChartAreas[0].AxisX.IsLogarithmic = false;
+                        //foreach (var series in chart3.Series)
+                        //{
+                        //    series.Points.Clear();
+                        //}
+                        //chart3.Titles["Curve"].Text = "";
+                    }
+
+                }
+            }
+            Thread.Sleep(200);
+            if (comboBox9.SelectedIndex > -1 && comboBox9.SelectedIndex < comboBox9.Items.Count) // Make sure selection is valid
+            {
+                if (SendCommandAndGetResponse("MemoryList.Get('Curve','" + (string)comboBox9.SelectedItem + "')")) // Send MemoryList.Get('Curve','<curve name> command and wait for response
+                {
+                    // Command completed successfully
+                    if (json.returnData.Value<Boolean>("Found"))
+                    {
+                        //chart4.Series["Series1"].Points.Clear(); // Clear chart
+                        // chart4.Titles["Curve"].Text = (string)comboBox9.SelectedItem; // Set chart title
+
+                        try
+                        {
+                            // Get X and Y data and plot them on the chart
+                            RXData4 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                            RYData4 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+
+                            judgeCurveFuncLeft(10);
+
+
+                            chart4.Series["Series1"].Points.DataBindXY(RXData4, RYData4);
+                            if (curveJudgeType[10] > 0)
+                            {
+                                chart4.Series[1].Points.DataBindXY(RXData4_Min,RYData4_Min);
+                                chart4.Series[2].Points.DataBindXY(RXData4_Max, RYData4_Max);
+                            }
+
+                            chart4.ChartAreas[0].AxisX.Minimum = RXData4.Min();
+                            chart4.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+
+                            chart4.ChartAreas[1].AxisX.Minimum = RXData4.Min();
+                            chart4.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+
+                            chart4.ChartAreas[2].AxisX.Minimum = RXData4.Min();
+                            chart4.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
+
+                            if (RXData4.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            {
+                                chart4.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart4.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart4.ChartAreas[2].AxisX.IsLogarithmic = true;
+                            }
+                            else
+                            {
+                                chart4.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart4.ChartAreas[1].AxisX.IsLogarithmic = false;
+                                chart4.ChartAreas[2].AxisX.IsLogarithmic = false;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    else
+                    {
+                        //// textBoxCurveInfo.Text = "Curve data not found!";
+                        //chart4.ChartAreas[0].AxisX.IsLogarithmic = false;
+                        //foreach (var series in chart4.Series)
+                        //{
+                        //    series.Points.Clear();
+                        //}
+                        //chart4.Titles["Curve"].Text = "";
+                    }
+
+                }
+            }
+            Thread.Sleep(200);
+            if (comboBox10.SelectedIndex > -1 && comboBox10.SelectedIndex < comboBox10.Items.Count) // Make sure selection is valid
+            {
+                if (SendCommandAndGetResponse("MemoryList.Get('Curve','" + (string)comboBox10.SelectedItem + "')")) // Send MemoryList.Get('Curve','<curve name> command and wait for response
+                {
+                    // Command completed successfully
+                    if (json.returnData.Value<Boolean>("Found"))
+                    {
+                        //  chart5.Series["Series1"].Points.Clear(); // Clear chart
+                        //  chart5.Titles["Curve"].Text = (string)comboBox10.SelectedItem; // Set chart title
+
+                        try
+                        {
+                            // Get X and Y data and plot them on the chart
+                            RXData5 = json.returnData.Curve.Value<JArray>("XData").ToObject<double[]>();
+                            RYData5 = json.returnData.Curve.Value<JArray>("YData").ToObject<double[]>();
+
+                            judgeCurveFuncLeft(11);
+
+                            chart5.Series["Series1"].Points.DataBindXY(RXData5, RYData5);
+
+                            if (curveJudgeType[11] > 0)
+                            {
+                                chart5.Series[1].Points.DataBindXY(RXData5_Min, RYData5_Min);
+                                chart5.Series[2].Points.DataBindXY(RXData5_Max, RYData5_Max);
+                            }
+
+                            chart5.ChartAreas[0].AxisX.Minimum = RXData5.Min();
+                            chart5.ChartAreas[0].AxisX.LabelStyle.Format = "{0:0}";
+                            chart5.ChartAreas[1].AxisX.Minimum = RXData5.Min();
+                            chart5.ChartAreas[1].AxisX.LabelStyle.Format = "{0:0}";
+                            chart5.ChartAreas[2].AxisX.Minimum = RXData5.Min();
+                            chart5.ChartAreas[2].AxisX.LabelStyle.Format = "{0:0}";
+
+                            if (RXData5.Min() > 0 && json.returnData.Curve.Value<String>("XAxisScale") == "Log")
+                            {
+                                chart5.ChartAreas[0].AxisX.IsLogarithmic = true;
+                                chart5.ChartAreas[1].AxisX.IsLogarithmic = true;
+                                chart5.ChartAreas[2].AxisX.IsLogarithmic = true;
+                            }
+                            else
+                            {
+                                chart5.ChartAreas[0].AxisX.IsLogarithmic = false;
+                                chart5.ChartAreas[1].AxisX.IsLogarithmic = false;
+                                chart5.ChartAreas[2].AxisX.IsLogarithmic = false;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    else
+                    {
+                        //// textBoxCurveInfo.Text = "Curve data not found!";
+                        //chart5.ChartAreas[0].AxisX.IsLogarithmic = false;
+                        //foreach (var series in chart5.Series)
+                        //{
+                        //    series.Points.Clear();
+                        //}
+                        //chart5.Titles["Curve"].Text = "";
+                    }
+
+                }
+            }
+
+            if (failCntRight> 0)
+            {
+                textTestResultR.BackColor = Color.Red;
+                textTestResultR.Text = "失败";
+            }
+            else
+            {
+                textTestResultR.BackColor = Color.Green;
+                textTestResultR.Text = "成功";
+            }
+        }
         //private void comboCurveNames_SelectedIndexChanged(object sender, EventArgs e) // User selected a curve. Get its data and show it in the graph
         //{
         //    if (comboCurveNames.SelectedIndex > -1 && comboCurveNames.SelectedIndex < comboCurveNames.Items.Count) // Make sure selection is valid
@@ -2252,23 +3010,13 @@ namespace SoundCheckTCPClient
 
         private bool ControlSwitch(string cmd)
         {
-            string read;
             try
             {
                 if (textCom3Status.Text == "连接成功")
                 {
                     cmd = cmd.Trim();
-                    for (byte i = 0; i < 5; i++)
-                    {
-                        com3.ClearInBuffer();
-                        com3.SendStringData(cmd + "\r\n");
-                        Thread.Sleep(100);
-                        read = com3.ReadStringData();
-                        if (read.IndexOf(cmd) > 0)
-                        {
-                            return true;
-                        }
-                    }
+                    com3.ClearInBuffer();
+                    com3.SendStringData(cmd + "\r\n");
                 }
             }
             catch
@@ -2305,18 +3053,13 @@ namespace SoundCheckTCPClient
                    dataGridView.Rows[j].Cells[4].Value = "";
                    dataGridView.Rows[j].Cells[5].Value = "";
             }
-
-
-            //AppendLogMessage("开箱.");
-            //com1.SendStringData("OPEN");
-
             testings = true;
 
             LeftTestThread  = new Thread(LeftChanTest);
             RightTestThread = new Thread(RightChanTest);
 
             LeftTestThread.Start();
-            RightTestThread.Start();
+           // RightTestThread.Start();
         }
 
         private void LeftChanTest()
@@ -3847,11 +4590,132 @@ namespace SoundCheckTCPClient
             InitDevice();
 
             LoadProjectConfig(projectName);
+            loadCurveRange();
+
+            if (File.Exists(rangePath))
+            {
+                ReadCsvToValueTable(rangePath, 1, dataGridView);
+
+                AppendLogMessage("Load Range:" + rangePath);
+            }
+            else
+            {
+                MessageBox.Show("判断标准文件不存在");
+                textTestResultL.Text = "加载失败";
+                textTestResultL.BackColor = Color.Red;
+                return;
+            }
 
             //string fName = Directory.GetCurrentDirectory().ToString() + "\\AA.csv";
 
             //ReadCsvToDataGrid(fName, 1, dataGridView2);
         }
+
+        private void loadCurveRange()
+        {
+            string fName = curvePath;// Directory.GetCurrentDirectory().ToString() + "\\Ref.ini";
+
+            FileStream fs = new FileStream(fName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            fs.Close();
+
+            try
+            {
+                curveJudgeType[0] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge1"));
+                curveJudgeType[1] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge2"));
+                curveJudgeType[2] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge3"));
+                curveJudgeType[3] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge4"));
+                curveJudgeType[4] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge5"));
+                curveJudgeType[5] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge6"));
+                curveJudgeType[6] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge7"));
+                curveJudgeType[7] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge8"));
+                curveJudgeType[8] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge9"));
+                curveJudgeType[9] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge10"));
+                curveJudgeType[10] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge11"));
+                curveJudgeType[11] = int.Parse(iniFile.IniReadValue(fName, "基准", "CurveJudge12"));
+
+                XData_Min=new double[ CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX1")).Length];
+                XData_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX1"));
+                YData_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY1")).Length];
+                YData_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY1"));
+                XData_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX1")).Length];
+                XData_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX1"));
+                YData_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY1")).Length];
+                YData_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY1"));
+
+                //if (curveJudgeType[0] == 0)
+                //{
+                //    chartCurve.Series[1].Points.DataBindXY(XData_Min, YData_Min);
+                //    chartCurve.Series[2].Points.DataBindXY(XData_Max, YData_Max);
+                //}
+
+                XData1_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX2")).Length];
+                XData1_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX2"));
+                YData1_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY2")).Length];
+                YData1_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY2"));
+                XData1_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX2")).Length];
+                XData1_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX2"));
+                YData1_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY2")).Length];
+                YData1_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY2"));
+
+                XData2_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX3")).Length];
+                XData2_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX3"));
+                YData2_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY3")).Length];
+                YData2_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY3"));
+                XData2_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX3")).Length];
+                XData2_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX3"));
+                YData2_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY3")).Length];
+                YData2_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY3"));
+
+                XData3_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX4")).Length];
+                XData3_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX4"));
+                YData3_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY4")).Length];
+                YData3_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY4"));
+                XData3_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX4")).Length];
+                XData3_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX4"));
+                YData3_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY4")).Length];
+                YData3_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY4"));
+
+
+                XData4_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX5")).Length];
+                XData4_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX5"));
+                YData4_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY5")).Length];
+                YData4_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY5"));
+                XData4_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX5")).Length];
+                XData4_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX5"));
+                YData4_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY5")).Length];
+                YData4_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY5"));
+
+                XData5_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX6")).Length];
+                XData5_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinX6"));
+                YData5_Min = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY6")).Length];
+                YData5_Min = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMinY6"));
+                XData5_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX6")).Length];
+                XData5_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxX6"));
+                YData5_Max = new double[CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY6")).Length];
+                YData5_Max = CsvStringToArray(iniFile.IniReadValue(fName, "基准", "CurveMaxY6"));
+
+            }
+            catch
+            {
+
+            }
+        }
+
+        private double[] CsvStringToArray(string str)
+        {
+            
+            string[] split = str.Substring(0,str.Length-8).Split(',');
+            double[] data = new double[split.Length];
+            //System.Data.DataRow dr = dt.NewRow();
+            for (int i = 0; i < split.Length; i++)
+            {
+                //if (split[0] != "")
+                //{
+                    data[i] = double.Parse(split[i]);
+                //}
+            }
+            return data;
+         }
 
         /// <summary>
         /// 
@@ -4060,6 +4924,21 @@ namespace SoundCheckTCPClient
                     // dataGridView2.Rows.Add(dv);
                 }
                
+            }
+
+            for (i = 0; i < 6; i++)
+            {
+                if (curveJudgeType[i] > 0)
+                {
+                    dt.Rows.Add();
+                    dt.Rows[rowIndex].Cells[0].Value = true;
+                    dt.Rows[rowIndex].Cells[1].Value = "WaveForm"+(i+1).ToString();
+                    //dt.Rows[rowIndex].Cells[2].Value = curveLowLimit[i].ToString();
+                    //dt.Rows[rowIndex].Cells[3].Value = curveHighLimit[i].ToString();
+
+
+                    rowIndex++;
+                }
             }
             reader.Close();
             return;
@@ -4451,28 +5330,9 @@ namespace SoundCheckTCPClient
                         if (SendCommandAndGetResponse("Sequence.GetStepsList")) // Send Sequence.GetStepsList command and wait for result.
                         {
                             // Command completed successfully
-
-                            //Column Headers
-                            //string[] colHeaders = new string[] { "Step Name", "Step Type", "Input Channel", "Output Channel" };
-
-                            //DataTable dataTable = InitializeDataTable(colHeaders.Length);
-
                             //// Populate Data Table
                             stepsList = json.Value<JArray>("returnData"); // Convert return data to dynamic objects array
 
-                            //foreach (JObject row in stepsList.Children<JObject>())
-                            //{
-                            //    DataRow dataRow = dataTable.NewRow();
-                            //    dataRow[0] = row.Value<string>("Name");
-                            //    dataRow[1] = row.Value<string>("Type");
-                            //    dataRow[2] = FormatChannelNames(row.Value<JArray>("InputChannelNames"));
-                            //    dataRow[3] = FormatChannelNames(row.Value<JArray>("OutputChannelNames"));
-                            //    dataTable.Rows.Add(dataRow);
-                            //}
-
-                            //// Update DataGridView
-                            //dataGridView.DataSource = dataTable;
-                            //UpdateHeaders(colHeaders);
                         }
                     }
                     else
@@ -4489,6 +5349,357 @@ namespace SoundCheckTCPClient
                     }
                 }
             }
+        }
+
+        private bool SaveCurveDataToIni (double[]xdata,double[] ydata)
+        {
+            string fName = curvePath;
+            FileStream fs = new FileStream(fName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            fs.Close();
+
+            string strLine = "";
+            for (int i = 0; i < xdata.Length; i++)
+            {
+                if (i > 0)
+                    strLine += ",";
+                strLine += xdata[i].ToString();
+            }
+            strLine.Remove(strLine.Length - 1);
+            iniFile.IniWriteValue(fName, "基准", "CurveValueX", strLine);
+
+            strLine = "";
+            for (int i = 0; i < xdata.Length; i++)
+            {
+                if (i > 0)
+                    strLine += ",";
+                strLine += xdata[i].ToString();
+            }
+            strLine.Remove(strLine.Length - 1);
+            iniFile.IniWriteValue(fName, "基准", "CurveValueY", strLine);
+
+            return true;
+        }
+        private void 设置ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CurveRange form = new CurveRange();
+            try
+            {
+                if (curveRightClickIndex == 0)
+                {
+                    int a = XData.Length;
+                }
+                else if (curveRightClickIndex == 1)
+                {
+                    int a = XData1.Length;
+                }
+                else if (curveRightClickIndex == 2)
+                {
+                    int a = XData2.Length;
+                }
+                else if (curveRightClickIndex == 3)
+                {
+                    int a = XData3.Length;
+                }
+                else if (curveRightClickIndex == 4)
+                {
+                    int a = XData4.Length;
+                }
+                else if (curveRightClickIndex == 5)
+                {
+                    int a = XData5.Length;
+                }
+
+
+            }
+            catch
+            {
+                MessageBox.Show("请先完成一次测试");
+                return;
+            }
+            string fName = Directory.GetCurrentDirectory().ToString() + "\\Ref.ini";
+            FileStream fs = new FileStream(fName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            fs.Close();
+
+            iniFile.IniWriteValue(fName, "基准", "curvePath", curvePath);
+            iniFile.IniWriteValue(fName, "基准", "curveSelectedIndex", curveRightClickIndex.ToString());
+
+            if (curveRightClickIndex == 0)
+            {
+                SaveCurveDataToIni(XData, YData);
+            }
+            else if (curveRightClickIndex == 1)
+            {
+                SaveCurveDataToIni(XData1, YData1);
+            }
+            else if (curveRightClickIndex == 2)
+            {
+                SaveCurveDataToIni(XData2, YData2);
+            }
+            else if (curveRightClickIndex == 3)
+            {
+                SaveCurveDataToIni(XData3, YData3);
+            }
+            else if (curveRightClickIndex == 4)
+            {
+                SaveCurveDataToIni(XData4, YData4);
+            }
+            else if (curveRightClickIndex == 5)
+            {
+                SaveCurveDataToIni(XData5, YData5);
+            }
+
+
+            if (p == null)
+            {
+                p = new System.Diagnostics.Process();
+                p.StartInfo.FileName = "SetRange.exe";
+                p.Start();
+            }
+            else
+            {
+                if (p.HasExited) //是否正在运行
+                {
+                    p.Start();
+                }
+            }
+            p.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+
+
+
+            // form.ShowDialog();
+
+
+
+            //if (form.DialogResult == DialogResult.OK)
+            //{
+            //    string fName = Directory.GetCurrentDirectory().ToString() + "\\Ref.ini";
+            //    FileStream fs = new FileStream(fName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            //    fs.Close();
+
+            //    if (whichcontrol_name == "chartCurve")
+            //    {
+            //        try
+            //        {
+            //            iniFile.IniWriteValue(fName, "基准", "CurveJudge1", form.judgeType.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveLowLimit1", form.lower.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveHighLimit1", form.upper.ToString());
+
+            //            //  MessageBox.Show("保存成功");
+            //        }
+            //        catch
+            //        {
+            //            MessageBox.Show("保存失败");
+            //            return;
+            //        }
+
+            //        curveRightClickIndex = 0;
+            //    }
+            //    else if (whichcontrol_name == "chart1")
+            //    {
+            //        try
+            //        {
+            //            iniFile.IniWriteValue(fName, "基准", "CurveJudge2", form.judgeType.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveLowLimit2", form.lower.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveHighLimit2", form.upper.ToString());
+
+            //            //  MessageBox.Show("保存成功");
+            //        }
+            //        catch
+            //        {
+            //            MessageBox.Show("保存失败");
+            //            return;
+            //        }
+            //        curveRightClickIndex = 1;
+            //    }
+            //    else if (whichcontrol_name == "chart2")
+            //    {
+            //        try
+            //        {
+            //            iniFile.IniWriteValue(fName, "基准", "CurveJudge3", form.judgeType.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveLowLimit3", form.lower.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveHighLimit3", form.upper.ToString());
+
+            //            //  MessageBox.Show("保存成功");
+            //        }
+            //        catch
+            //        {
+            //            MessageBox.Show("保存失败");
+            //            return;
+            //        }
+            //        curveRightClickIndex = 2;
+            //    }
+            //    else if (whichcontrol_name == "chart3")
+            //    {
+            //        try
+            //        {
+            //            iniFile.IniWriteValue(fName, "基准", "CurveJudge4", form.judgeType.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveLowLimit4", form.lower.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveHighLimit4", form.upper.ToString());
+
+            //            //  MessageBox.Show("保存成功");
+            //        }
+            //        catch
+            //        {
+            //            MessageBox.Show("保存失败");
+            //            return;
+            //        }
+            //        curveRightClickIndex = 3;
+            //    }
+            //    else if (whichcontrol_name == "chart4")
+            //    {
+            //        try
+            //        {
+            //            iniFile.IniWriteValue(fName, "基准", "CurveJudge5", form.judgeType.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveLowLimit5", form.lower.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveHighLimit5", form.upper.ToString());
+
+            //            //  MessageBox.Show("保存成功");
+            //        }
+            //        catch
+            //        {
+            //            MessageBox.Show("保存失败");
+            //            return;
+            //        }
+            //        curveRightClickIndex = 4;
+            //    }
+            //    else if (whichcontrol_name == "chart5")
+            //    {
+            //        try
+            //        {
+            //            iniFile.IniWriteValue(fName, "基准", "CurveJudge6", form.judgeType.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveLowLimit6", form.lower.ToString());
+            //            iniFile.IniWriteValue(fName, "基准", "CurveHighLimit6", form.upper.ToString());
+
+            //            //  MessageBox.Show("保存成功");
+            //        }
+            //        catch
+            //        {
+            //            MessageBox.Show("保存失败");
+            //            return;
+            //        }
+            //        curveRightClickIndex = 5;
+            //    }
+
+            //}
+
+
+        }
+
+        private void contextMenuCurve_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            whichcontrol_name = (sender as ContextMenuStrip).SourceControl.Name;
+            if (whichcontrol_name == "chartCurve")
+            {
+                curveRightClickIndex = 0;
+            }
+            else if (whichcontrol_name == "chart1")
+            {
+                curveRightClickIndex = 1;
+            }
+            else if (whichcontrol_name == "chart2")
+            {
+                curveRightClickIndex = 2;
+            }
+            else if (whichcontrol_name == "chart3")
+            {
+                curveRightClickIndex = 3;
+            }
+            else if (whichcontrol_name == "chart4")
+            {
+
+                curveRightClickIndex = 4;
+            }
+            else if (whichcontrol_name == "chart5")
+            {
+                curveRightClickIndex = 5;
+            }
+            // MessageBox.Show(whichcontrol_name);
+        }
+
+        private void 设置Right范围ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CurveRange form = new CurveRange();
+            try
+            {
+                if (curveRightClickIndex == 0)
+                {
+                    int a = RXData.Length;
+                }
+                else if (curveRightClickIndex == 1)
+                {
+                    int a = RXData1.Length;
+                }
+                else if (curveRightClickIndex == 2)
+                {
+                    int a = RXData2.Length;
+                }
+                else if (curveRightClickIndex == 3)
+                {
+                    int a = RXData3.Length;
+                }
+                else if (curveRightClickIndex == 4)
+                {
+                    int a = RXData4.Length;
+                }
+                else if (curveRightClickIndex == 5)
+                {
+                    int a = RXData5.Length;
+                }
+
+
+            }
+            catch
+            {
+                MessageBox.Show("请先完成一次测试");
+                return;
+            }
+            string fName = Directory.GetCurrentDirectory().ToString() + "\\Ref.ini";
+            FileStream fs = new FileStream(fName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            fs.Close();
+
+            iniFile.IniWriteValue(fName, "基准", "curvePath", curvePath);
+            iniFile.IniWriteValue(fName, "基准", "curveSelectedIndex", (curveRightClickIndex+6).ToString());
+
+            if (curveRightClickIndex == 0)
+            {
+                SaveCurveDataToIni(RXData, RYData);
+            }
+            else if (curveRightClickIndex == 1)
+            {
+                SaveCurveDataToIni(RXData1, RYData1);
+            }
+            else if (curveRightClickIndex == 2)
+            {
+                SaveCurveDataToIni(RXData2, RYData2);
+            }
+            else if (curveRightClickIndex == 3)
+            {
+                SaveCurveDataToIni(RXData3, RYData3);
+            }
+            else if (curveRightClickIndex == 4)
+            {
+                SaveCurveDataToIni(RXData4, RYData4);
+            }
+            else if (curveRightClickIndex == 5)
+            {
+                SaveCurveDataToIni(RXData5, RYData5);
+            }
+
+
+            if (p == null)
+            {
+                p = new System.Diagnostics.Process();
+                p.StartInfo.FileName = "SetRange.exe";
+                p.Start();
+            }
+            else
+            {
+                if (p.HasExited) //是否正在运行
+                {
+                    p.Start();
+                }
+            }
+            p.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;        
         }
     }
 }

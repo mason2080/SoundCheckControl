@@ -79,6 +79,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CurveRange.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CurveRange.Designer.cs">
+      <DependentUpon>CurveRange.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -99,6 +105,9 @@
       <DependentUpon>Project.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CurveRange.resx">
+      <DependentUpon>CurveRange.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

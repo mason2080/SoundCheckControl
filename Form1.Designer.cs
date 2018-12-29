@@ -31,21 +31,23 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title4 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title5 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.btnSeqOpen = new System.Windows.Forms.Button();
             this.textBoxSeqFilePath = new System.Windows.Forms.TextBox();
@@ -63,6 +65,9 @@
             this.btnSeqRun = new System.Windows.Forms.Button();
             this.comboCurveNames = new System.Windows.Forms.ComboBox();
             this.chartCurve = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.contextMenuCurve = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.设置Right范围ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textBoxCurveInfo = new System.Windows.Forms.TextBox();
             this.textBoxExePath = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -184,6 +189,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.timerConnectSC = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.chartCurve)).BeginInit();
+            this.contextMenuCurve.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -375,6 +381,7 @@
             this.chartCurve.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chartArea1.Name = "ChartArea1";
             this.chartCurve.ChartAreas.Add(chartArea1);
+            this.chartCurve.ContextMenuStrip = this.contextMenuCurve;
             this.chartCurve.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chartCurve.Location = new System.Drawing.Point(2, 23);
             this.chartCurve.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
@@ -383,7 +390,15 @@
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series1.IsVisibleInLegend = false;
             series1.Name = "Series1";
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series2.Name = "Series2";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series3.Name = "Series3";
             this.chartCurve.Series.Add(series1);
+            this.chartCurve.Series.Add(series2);
+            this.chartCurve.Series.Add(series3);
             this.chartCurve.Size = new System.Drawing.Size(514, 146);
             this.chartCurve.TabIndex = 10;
             this.chartCurve.Text = "chart1";
@@ -391,6 +406,29 @@
             title1.Text = "Curve";
             title1.Visible = false;
             this.chartCurve.Titles.Add(title1);
+            // 
+            // contextMenuCurve
+            // 
+            this.contextMenuCurve.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.设置ToolStripMenuItem,
+            this.设置Right范围ToolStripMenuItem});
+            this.contextMenuCurve.Name = "contextMenuStrip1";
+            this.contextMenuCurve.Size = new System.Drawing.Size(181, 70);
+            this.contextMenuCurve.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuCurve_Opening);
+            // 
+            // 设置ToolStripMenuItem
+            // 
+            this.设置ToolStripMenuItem.Name = "设置ToolStripMenuItem";
+            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.设置ToolStripMenuItem.Text = "设置Left范围";
+            this.设置ToolStripMenuItem.Click += new System.EventHandler(this.设置ToolStripMenuItem_Click);
+            // 
+            // 设置Right范围ToolStripMenuItem
+            // 
+            this.设置Right范围ToolStripMenuItem.Name = "设置Right范围ToolStripMenuItem";
+            this.设置Right范围ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.设置Right范围ToolStripMenuItem.Text = "设置Right范围";
+            this.设置Right范围ToolStripMenuItem.Click += new System.EventHandler(this.设置Right范围ToolStripMenuItem_Click);
             // 
             // textBoxCurveInfo
             // 
@@ -1148,15 +1186,16 @@
             this.chart5.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chartArea2.Name = "ChartArea1";
             this.chart5.ChartAreas.Add(chartArea2);
+            this.chart5.ContextMenuStrip = this.contextMenuCurve;
             this.chart5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chart5.Location = new System.Drawing.Point(520, 363);
             this.chart5.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.chart5.Name = "chart5";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series2.IsVisibleInLegend = false;
-            series2.Name = "Series1";
-            this.chart5.Series.Add(series2);
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series4.IsVisibleInLegend = false;
+            series4.Name = "Series1";
+            this.chart5.Series.Add(series4);
             this.chart5.Size = new System.Drawing.Size(515, 148);
             this.chart5.TabIndex = 10;
             this.chart5.Text = "chart1";
@@ -1181,15 +1220,16 @@
             this.chart4.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chartArea3.Name = "ChartArea1";
             this.chart4.ChartAreas.Add(chartArea3);
+            this.chart4.ContextMenuStrip = this.contextMenuCurve;
             this.chart4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chart4.Location = new System.Drawing.Point(2, 363);
             this.chart4.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.chart4.Name = "chart4";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series3.IsVisibleInLegend = false;
-            series3.Name = "Series1";
-            this.chart4.Series.Add(series3);
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series5.IsVisibleInLegend = false;
+            series5.Name = "Series1";
+            this.chart4.Series.Add(series5);
             this.chart4.Size = new System.Drawing.Size(514, 148);
             this.chart4.TabIndex = 10;
             this.chart4.Text = "chart1";
@@ -1224,15 +1264,16 @@
             this.chart3.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chartArea4.Name = "ChartArea1";
             this.chart3.ChartAreas.Add(chartArea4);
+            this.chart3.ContextMenuStrip = this.contextMenuCurve;
             this.chart3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chart3.Location = new System.Drawing.Point(520, 193);
             this.chart3.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.chart3.Name = "chart3";
-            series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series4.IsVisibleInLegend = false;
-            series4.Name = "Series1";
-            this.chart3.Series.Add(series4);
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series6.IsVisibleInLegend = false;
+            series6.Name = "Series1";
+            this.chart3.Series.Add(series6);
             this.chart3.Size = new System.Drawing.Size(515, 146);
             this.chart3.TabIndex = 10;
             this.chart3.Text = "chart1";
@@ -1247,15 +1288,16 @@
             this.chart1.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chartArea5.Name = "ChartArea1";
             this.chart1.ChartAreas.Add(chartArea5);
+            this.chart1.ContextMenuStrip = this.contextMenuCurve;
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chart1.Location = new System.Drawing.Point(520, 23);
             this.chart1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.chart1.Name = "chart1";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series5.IsVisibleInLegend = false;
-            series5.Name = "Series1";
-            this.chart1.Series.Add(series5);
+            series7.ChartArea = "ChartArea1";
+            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series7.IsVisibleInLegend = false;
+            series7.Name = "Series1";
+            this.chart1.Series.Add(series7);
             this.chart1.Size = new System.Drawing.Size(515, 146);
             this.chart1.TabIndex = 10;
             this.chart1.Text = "chart1";
@@ -1280,15 +1322,16 @@
             this.chart2.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chartArea6.Name = "ChartArea1";
             this.chart2.ChartAreas.Add(chartArea6);
+            this.chart2.ContextMenuStrip = this.contextMenuCurve;
             this.chart2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chart2.Location = new System.Drawing.Point(2, 193);
             this.chart2.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.chart2.Name = "chart2";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series6.IsVisibleInLegend = false;
-            series6.Name = "Series1";
-            this.chart2.Series.Add(series6);
+            series8.ChartArea = "ChartArea1";
+            series8.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series8.IsVisibleInLegend = false;
+            series8.Name = "Series1";
+            this.chart2.Series.Add(series8);
             this.chart2.Size = new System.Drawing.Size(514, 146);
             this.chart2.TabIndex = 10;
             this.chart2.Text = "chart1";
@@ -1976,6 +2019,7 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.chartCurve)).EndInit();
+            this.contextMenuCurve.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -2194,6 +2238,9 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.SplitContainer splitContainer11;
         private System.Windows.Forms.Button btnOpenSeq2;
+        private System.Windows.Forms.ContextMenuStrip contextMenuCurve;
+        private System.Windows.Forms.ToolStripMenuItem 设置ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 设置Right范围ToolStripMenuItem;
     }
 }
 

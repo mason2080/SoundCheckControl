@@ -31,3 +31,18 @@ C:\Users\Administrator\Desktop\LabVIEW2014\C Sharp\C Sharp_SCAudioTest\Source\ob
 C:\Users\Administrator\Desktop\LabVIEW2014\C Sharp\C Sharp_SCAudioTest\Source\obj\x86\Debug\C Sharp Example.pdb
 C:\Users\Administrator\Desktop\LabVIEW2014\C Sharp\C Sharp_SCAudioTest\Source\obj\x86\Debug\SoundCheckTCPClient.Project.resources
 C:\Users\Administrator\Desktop\LabVIEW2014\C Sharp\C Sharp_SCAudioTest\Source\obj\x86\Debug\C Sharp Example.csprojAssemblyReference.cache
+E:\GitHub\SoundCheckControl\obj\x86\Debug\SoundCheckTCPClient.CurveRange.resources
+E:\GitHub\SoundCheckControl\obj\x86\Debug\SoundCheckTCPClient.Form1.resources
+E:\GitHub\SoundCheckControl\obj\x86\Debug\SoundCheckTCPClient.Login.resources
+E:\GitHub\SoundCheckControl\obj\x86\Debug\SoundCheckTCPClient.Project.resources
+E:\GitHub\SoundCheckControl\obj\x86\Debug\SoundCheckTCPClient.Properties.Resources.resources
+E:\GitHub\SoundCheckControl\obj\x86\Debug\C Sharp Example.csproj.GenerateResource.cache
+E:\GitHub\SoundCheckControl\obj\x86\Debug\C Sharp Example.csproj.CoreCompileInputs.cache
+E:\GitHub\SoundCheckControl\obj\x86\Debug\C Sharp Example.exe
+E:\GitHub\SoundCheckControl\obj\x86\Debug\C Sharp Example.pdb
+E:\GitHub\SoundCheckControl\bin\x86\Debug\C Sharp Example.exe.config
+E:\GitHub\SoundCheckControl\bin\x86\Debug\C Sharp Example.exe
+E:\GitHub\SoundCheckControl\bin\x86\Debug\C Sharp Example.pdb
+E:\GitHub\SoundCheckControl\bin\x86\Debug\Newtonsoft.Json.dll
+E:\GitHub\SoundCheckControl\bin\x86\Debug\Newtonsoft.Json.xml
+E:\GitHub\SoundCheckControl\obj\x86\Debug\C Sharp Example.csproj.CopyComplete
